@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
 import { HexDataService } from './hex-data.service';
 
-@Injectable()
-export class AppService {
+@Controller('hex-data')
+export class HexDataController {
   constructor(private readonly hexDataService: HexDataService) {}
 
-  async saveData(data: string): Promise<any> {
+  @Post()
+  create(@Body('data') data: string) {
     return this.hexDataService.create(data);
   }
 }
