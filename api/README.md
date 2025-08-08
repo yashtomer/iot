@@ -127,6 +127,8 @@ To deploy this project on an Ubuntu server, follow these general steps:
 
 5.  **Configure and Run MQTT Broker:**
     Follow the "MQTT Broker Setup" steps above.
+    
+    sudo docker run -d -p 1883:1883 -p 9001:9001 -v /home/yash/iot/api/mosquitto.conf:/mosquitto/config/mosquitto.conf --name mosquitto eclipse-mosquitto
 
 6.  **Install Node.js Dependencies:**
     ```bash
