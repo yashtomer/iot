@@ -32,6 +32,7 @@ async function bootstrap() {
   cleanUpSockets();
 
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
 
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.MQTT,
@@ -41,7 +42,7 @@ async function bootstrap() {
   });
 
   await app.startAllMicroservices();
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT || 3001);
 
   // Clean up on exit/shutdown signals
   const shutdown = async () => {
