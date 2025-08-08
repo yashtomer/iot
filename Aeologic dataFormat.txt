@@ -1,0 +1,12 @@
+{"timestamp": "2025-08-07 21:25:27.0000","information": "CA0000000023000304010101017A9F"}
+
+
+CA0000000023	//Device identifier
+00		//Data type, 00 for Temp
+03		//Function Type
+04		//Number of bytes (04 means 4 byte data)
+01		//1 byte 1st Sensor Data 00/01  
+01		//1 byte 2nd Sensor Data 00/01
+01		//1 byte 3rd Sensor Data 00/01
+01		//1 byte 4th Sensor Data 00/01
+7A9F		//2 byte CRC, use if you want to otherwise skip
