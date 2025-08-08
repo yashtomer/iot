@@ -15,14 +15,16 @@ export class MqttService implements OnModuleInit {
       console.log('Connected to MQTT broker');
       this.client.subscribe('iot-data', (err) => {
         if (!err) {
-          console.log('Subscribed to iot-data topic');
+          console.log('Subscribed to iot-data topic dsd');
         }
       });
     });
 
     this.client.on('message', (topic, message) => {
       if (topic === 'iot-data') {
-        console.log(`Received message on topic ${topic}: ${message.toString()}`);
+        console.log(
+          `Received message on topic ${topic}: ${message.toString()}`,
+        );
         this.hexDataService.create(message.toString('hex'));
       }
     });

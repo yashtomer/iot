@@ -11,7 +11,7 @@ export class HexDataService {
   ) {}
 
   async create(data: string): Promise<HexData> {
-    console.log('HexDataService: Attempting to save data:', data);
+    //console.log('HexDataService: Attempting to save data:', data);
     const hexData = new HexData();
     hexData.data = data;
     try {
