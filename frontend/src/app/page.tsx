@@ -95,23 +95,23 @@ const DeviceDataTable = () => {
 
             <div className="overflow-x-auto rounded-lg border border-gray-200">
               <table className="min-w-full divide-y divide-gray-200 text-sm">
-                <thead className="bg-gray-50">
+                <thead className="bg-gray-800 text-white">
                   <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Device Identifier</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Type</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Function Type</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Number of Bytes</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sensor Data 1</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sensor Data 2</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sensor Data 3</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sensor Data 4</th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CRC</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Device Identifier</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Data Type</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Function Type</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Number of Bytes</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Sensor Data 1</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Sensor Data 2</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Sensor Data 3</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Sensor Data 4</th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">CRC</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200">
                   {rows.length > 0 ? (
-                    rows.map((row: HexDataRow) => (
-                      <tr key={row.id} className="hover:bg-gray-50">
+                    rows.map((row: HexDataRow, index) => (
+                      <tr key={row.id} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100`}>
                         <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{row.device_identifier}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-gray-500">{row.data_type}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-gray-500">{row.function_type}</td>
