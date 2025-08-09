@@ -23,11 +23,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50 dark:bg-slate-950 bg-[radial-gradient(ellipse_at_top,rgba(14,165,233,0.08),transparent_45%),radial-gradient(ellipse_at_bottom,rgba(99,102,241,0.08),transparent_45%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(14,165,233,0.12),transparent_45%),radial-gradient(ellipse_at_bottom,rgba(99,102,241,0.12),transparent_45%)] text-slate-900 dark:text-slate-100`}
       >
-        {children}
+        {/* Set initial theme before React hydration to avoid flash */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
+  try {
+    const stored = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = stored ? stored === 'dark' : prefersDark;
+    const root = document.documentElement;
+    if (isDark) root.classList.add('dark');
+    else root.classList.remove('dark');
+  } catch {}
+})();`,
+          }}
+        />
+        <div className="min-h-dvh">
+          {children}
+        </div>
       </body>
     </html>
   );
