@@ -6,9 +6,10 @@ const client = mqtt.connect('mqtt://127.0.0.1:1883');
 client.on('connect', function () {
   console.log('Successfully connected to MQTT broker!');
   setInterval(function () {
-    const hexData = '48656c6c6f2048657821'; // Sample hex string for "Hello Hex!"
+    const hexData = 'CA0000000023000304010101017A9F'; // Sample hex string for "Hello Hex!"
     const buffer = Buffer.from(hexData, 'hex');
-    client.publish('iot-data', buffer);
+    const message = JSON.stringify({ data: buffer });
+    client.publish('iot-data', message);
     console.log('Published hex data:', hexData);
   }, 1000);
 });

@@ -7,10 +7,10 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @MessagePattern('iot-data')
-  async getNotifications(@Payload() data: number[]) {
-    //console.log(data);
-    const hexString = Buffer.from(data).toString('hex');
+  async getNotifications(@Payload() payload: any) {          
+    const buffer = Buffer.from(payload.data);  
+    const hexString = buffer.toString('hex');    
     await this.appService.saveData(hexString);
-    //console.log('Data saved to hex_data table:', hexString);
+    console.log('Final hex string:', hexString);
   }
 }
