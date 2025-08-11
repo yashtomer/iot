@@ -1,1 +1,25 @@
 @import "tailwindcss";
+
+/* Enable class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* App theme tweaks */
+:root {
+  color-scheme: light dark;
+}
+
+html, body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Smoothen scroll for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Table helpers for sticky first column on small screens */
+th:first-child, td:first-child {
+  position: sticky;
+  left: 0;
+}

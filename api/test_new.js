@@ -5,7 +5,7 @@ const sendDummyData = async () => {
   const information = `CA0000000023000304010101017A9F`;
 
   try {
-    const response = await axios.post('http://localhost:3001/hex-data', {
+    const response = await axios.post('http://104.255.220.22:3023/hex-data', {
       timestamp: `${timestamp}.0000`,
       information: information,
     });
