@@ -20,21 +20,21 @@ export class HexData {
   @Column({ type: 'varchar', nullable: true })
   function_type: string;
 
-  @Column({ type: 'int', nullable: true })
-  number_of_bytes: number;
+  @Column({ type: 'varchar', nullable: true })
+  number_of_bytes: string;
 
-  @Column({ type: 'int', nullable: true })
-  '1byte_1st_sensor': number;
+  @Column({ type: 'varchar', nullable: true })
+  '1byte_1st_sensor': string;
 
-  @Column({ type: 'int', nullable: true })
-  '1byte_2nd_sensor': number;
+  @Column({ type: 'varchar', nullable: true })
+  '1byte_2nd_sensor': string;
 
-  @Column({ type: 'int', nullable: true })
-  '1byte_3rd_sensor': number;
+  @Column({ type: 'varchar', nullable: true })
+  '1byte_3rd_sensor': string;
 
-  @Column({ type: 'int', nullable: true })
-  '1byte_4th_sensor': number;
+  @Column({ type: 'varchar', nullable: true })
+  '1byte_4th_sensor': string;
 
-  @Column({ type: 'int', nullable: true })
-  '2byte_crc': number;
+  @Column({ type: 'varchar', nullable: true })
+  '2byte_crc': string;
 }

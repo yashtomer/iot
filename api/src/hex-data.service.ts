@@ -12,18 +12,19 @@ export class HexDataService {
 
   async create(information: string): Promise<HexData> {
     const hexData = new HexData();
+    information = information.toUpperCase();
     hexData.data = information;
 
     // Parsing logic
     hexData.device_identifier = information.substring(0, 12);
     hexData.data_type = information.substring(12, 14);
     hexData.function_type = information.substring(14, 16);
-    hexData.number_of_bytes = parseInt(information.substring(16, 18), 16);
-    hexData['1byte_1st_sensor'] = parseInt(information.substring(18, 20), 16);
-    hexData['1byte_2nd_sensor'] = parseInt(information.substring(20, 22), 16);
-    hexData['1byte_3rd_sensor'] = parseInt(information.substring(22, 24), 16);
-    hexData['1byte_4th_sensor'] = parseInt(information.substring(24, 26), 16);
-    hexData['2byte_crc'] = parseInt(information.substring(26, 30), 16);
+    hexData.number_of_bytes = information.substring(16, 18);
+    hexData['1byte_1st_sensor'] = information.substring(18, 20);
+    hexData['1byte_2nd_sensor'] = information.substring(20, 22);
+    hexData['1byte_3rd_sensor'] = information.substring(22, 24);
+    hexData['1byte_4th_sensor'] = information.substring(24, 26);
+    hexData['2byte_crc'] = information.substring(26, 30);
 
     try {
       const savedData = await this.hexDataRepository.save(hexData);
