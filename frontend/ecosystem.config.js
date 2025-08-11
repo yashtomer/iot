@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: 'next-app',
+      name: 'iot-aeologic-raj-frontend',
       script: 'npm',
       args: 'run start',  // Runs `next start`
       instances: 1,       // Or "max" for multi-core
