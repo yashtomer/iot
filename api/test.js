@@ -9,7 +9,7 @@ client.on('connect', function () {
     const hexData = 'CA0000000023000304010101017A9F'; // Sample hex string for "Hello Hex!"
     const buffer = Buffer.from(hexData, 'hex');
     const message = JSON.stringify({ data: buffer });
-    client.publish('iot-data', message);
+    client.publish('aeologic_iot', message);
     console.log('Published hex data:', hexData);
   }, 1000);
 });
