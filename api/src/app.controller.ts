@@ -6,7 +6,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @MessagePattern('iot-data')
+  @MessagePattern('aeologic_iot')
   async getNotifications(@Payload() payload: any) {          
     const buffer = Buffer.from(payload.data);  
     const hexString = buffer.toString('hex');    
