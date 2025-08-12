@@ -5,7 +5,7 @@ client.on('connect', function () {
   console.log('Successfully connected to MQTT broker!');
   
   setInterval(function () {
-    const hexData = 'CA0000000023FF03261F0000000000000000000000000000000000473031303036474D4C4E4152474D304E30520800CE6F'; // Sample hex string
+    const hexData = 'CA0000000023000304010101017A9F'; // Sample hex string
 
     // Get current timestamp in your required format
     const now = new Date();
