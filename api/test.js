@@ -1,16 +1,36 @@
 const mqtt = require('mqtt');
 const client = mqtt.connect('mqtt://127.0.0.1:1883');
 
-//const client = mqtt.connect('mqtt://104.255.220.22:1883');
-
 client.on('connect', function () {
   console.log('Successfully connected to MQTT broker!');
+  
   setInterval(function () {
-    const hexData = 'CA0000000023000304010101017A9F'; // Sample hex string for "Hello Hex!"
-    const buffer = Buffer.from(hexData, 'hex');
-    const message = JSON.stringify({ data: buffer });
+    const hexData = 'CA0000000023FF03261F0000000000000000000000000000000000473031303036474D4C4E4152474D304E30520800CE6F'; // Sample hex string
+
+    // Get current timestamp in your required format
+    const now = new Date();
+    const timestamp =
+      now.getFullYear() +
+      '-' +
+      String(now.getMonth() + 1).padStart(2, '0') +
+      '-' +
+      String(now.getDate()).padStart(2, '0') +
+      ' ' +
+      String(now.getHours()).padStart(2, '0') +
+      ':' +
+      String(now.getMinutes()).padStart(2, '0') +
+      ':' +
+      String(now.getSeconds()).padStart(2, '0') +
+      '.0000';
+
+    // Prepare message in desired format
+    const message = JSON.stringify({
+      timestamp: timestamp,
+      information: hexData
+    });
+
     client.publish('aeologic_iot', message);
-    console.log('Published hex data:', hexData);
+    console.log('Published:', message);
   }, 1000);
 });
 
