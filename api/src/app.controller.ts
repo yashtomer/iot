@@ -8,6 +8,11 @@ export class AppController {
 
   @MessagePattern('aeologic_iot')
   async getNotifications(@Payload() payload: any) {          
+    console.log('Payload received:', payload);
+    if(!payload?.data){
+      console.log('No data received');
+      return;
+    }
     const buffer = Buffer.from(payload.data);  
     const hexString = buffer.toString('hex');    
     await this.appService.saveData(hexString);
