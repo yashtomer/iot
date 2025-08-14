@@ -14,8 +14,12 @@ export class HexDataController {
   async findAll(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
   ) {
-    return this.hexDataService.findAll(page, limit);
+    const start = startDate ? new Date(startDate) : undefined;
+    const end = endDate ? new Date(endDate) : undefined;
+    return this.hexDataService.findAll(page, limit, start, end);
   }
 
   @Get('status-counts')
