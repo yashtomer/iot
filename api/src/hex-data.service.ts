@@ -36,9 +36,16 @@ export class HexDataService {
     }
   }
 
-  async findAll(page: number, limit: number): Promise<{ data: HexData[]; total: number }> {
+  async findAll(page: number, limit: number, startDate?: Date, endDate?: Date): Promise<{ data: HexData[]; total: number }> {
     const skip = (page - 1) * limit;
+    const where: any = {};
+
+    if (startDate && endDate) {
+      where.createdAt = Between(startDate, endDate);
+    }
+
     const [data, total] = await this.hexDataRepository.findAndCount({
+      where,
       order: {
         createdAt: 'DESC',
       },

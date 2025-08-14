@@ -73,6 +73,8 @@ const SensorPieChart = ({ data, title }: { data: SensorData[], title: string }) 
 };
 
 
+import { subMonths } from 'date-fns';
+
 const DashboardPage = () => {
   const [rows, setRows] = useState<HexDataRow[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +87,7 @@ const DashboardPage = () => {
   const limit = 10; // Number of items per page
   const [isDark, setIsDark] = useState<boolean>(false);
   const [sensorData, setSensorData] = useState<SensorData[][]>([]);
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(subMonths(new Date(), 2));
   const [endDate, setEndDate] = useState(new Date());
 
 
@@ -94,7 +96,13 @@ const DashboardPage = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hex-data?page=${currentPage}&limit=${limit}`;
+        const formattedStartDate = new Date(startDate);
+        formattedStartDate.setHours(0, 0, 0, 0);
+
+        const formattedEndDate = new Date(endDate);
+        formattedEndDate.setHours(23, 59, 59, 999);
+
+        const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hex-data?page=${currentPage}&limit=${limit}&startDate=${formattedStartDate.toISOString()}&endDate=${formattedEndDate.toISOString()}`;
         const response = await fetch(apiUrl);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
