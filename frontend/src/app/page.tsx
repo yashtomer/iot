@@ -1,5 +1,8 @@
 'use client';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { PureComponent, useEffect, useMemo, useState } from 'react';
+import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from 'recharts';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 interface HexDataRow {
   id: number;
@@ -9,14 +12,68 @@ interface HexDataRow {
   data_type: string | null;
   function_type: string | null;
   number_of_bytes: number | null;
-  '1byte_1st_sensor': number | null;
-  '1byte_2nd_sensor': number | null;
-  '1byte_3rd_sensor': number | null;
-  '1byte_4th_sensor': number | null;
+  '1byte_1st_sensor': string | null;
+  '1byte_2nd_sensor': string | null;
+  '1byte_3rd_sensor': string | null;
+  '1byte_4th_sensor': string | null;
   '2byte_crc': number | null;
 }
 
-const DeviceDataTable = () => {
+interface SensorData {
+  name: string;
+  value: number;
+}
+
+const SensorPieChart = ({ data, title }: { data: SensorData[], title: string }) => {
+  const COLORS = ['#0088FE', '#FF8042'];
+  const totalValue = data.reduce((acc, entry) => acc + entry.value, 0);
+
+  if (totalValue === 0) {
+    return (
+      <div className="w-full h-64 flex flex-col">
+        {/* Title on top */}
+        <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 text-center">
+          {title}
+        </h3>
+
+        {/* Center "No Data Found" */}
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-slate-600 dark:text-slate-400">No data found for this time period</p>
+        </div>
+      </div>
+
+    );
+  }
+
+  return (
+    <div className="w-full h-64">
+      <h3 className="text-center text-lg font-medium text-slate-900 dark:text-slate-100">{title}</h3>
+
+      <ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            outerRadius={80}
+            fill="#8884d8"
+            dataKey="value"
+            label={({ name, percent, value }) => `${name}: ${value} (${((percent ?? 0) * 100).toFixed(0)}%)`}
+            style={{ outline: 'none' }}
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+
+const DashboardPage = () => {
   const [rows, setRows] = useState<HexDataRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -27,6 +84,10 @@ const DeviceDataTable = () => {
   const [reloadToggle, setReloadToggle] = useState<boolean>(false);
   const limit = 10; // Number of items per page
   const [isDark, setIsDark] = useState<boolean>(false);
+  const [sensorData, setSensorData] = useState<SensorData[][]>([]);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +116,35 @@ const DeviceDataTable = () => {
 
     fetchData();
   }, [currentPage, reloadToggle]);
+
+  const fetchSensorData = async () => {
+    try {
+      const formattedStartDate = new Date(startDate);
+      formattedStartDate.setHours(0, 0, 0, 0);
+
+      const formattedEndDate = new Date(endDate);
+      formattedEndDate.setHours(23, 59, 59, 999);
+
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/hex-data/status-counts?startDate=${formattedStartDate.toISOString()}&endDate=${formattedEndDate.toISOString()}`;
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      console.log('Sensor Data:', result);
+      setSensorData(result);
+    } catch (error) {
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('An unknown error occurred');
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchSensorData();
+  }, [reloadToggle]);
 
   const handlePreviousPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
@@ -102,6 +192,16 @@ const DeviceDataTable = () => {
     } catch {
       return '-';
     }
+  };
+
+  const formatSensorStatus = (status: string | null) => {
+    if (status === '01') {
+      return 'On';
+    }
+    if (status === '00') {
+      return 'Off';
+    }
+    return 'Off';
   };
 
   const jsonLd = {
@@ -180,6 +280,40 @@ const DeviceDataTable = () => {
 
       <main>
         <section className="mx-auto max-w-7xl px-4 pb-16">
+          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/70 mb-8">
+            <div className="border-b border-slate-200 p-6 dark:border-slate-800">
+              <h2 className="text-lg font-medium text-slate-900 dark:text-slate-100">Sensor Status Overview</h2>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">On/Off status for each sensor over the selected period.</p>
+            </div>
+            <div className="p-6">
+              <div className="flex items-center gap-4">
+                <div>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mr-2">From</label>
+                  <DatePicker selected={startDate} onChange={(date) => date && setStartDate(date)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-0 placeholder:text-slate-400 shadow-sm focus:border-sky-300 focus:ring-2 focus:ring-sky-200 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-slate-800 cursor-pointer" dateFormat={"dd/MM/yyyy"} />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mr-2">To</label>
+                  <DatePicker selected={endDate} onChange={(date) => date && setEndDate(date)} className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none ring-0 placeholder:text-slate-400 shadow-sm focus:border-sky-300 focus:ring-2 focus:ring-sky-200 dark:border-slate-700 dark:bg-slate-800 dark:focus:ring-slate-800 cursor-pointer" dateFormat={"dd/MM/yyyy"} />
+                </div>
+                <button
+                  onClick={fetchSensorData}
+                  className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-800 active:bg-slate-900/90 dark:bg-slate-700 dark:hover:bg-slate-600 cursor-pointer"
+                >
+                  Submit
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                {sensorData && sensorData.length > 0 ? (
+                  sensorData.map((data, index) => (
+                    <SensorPieChart key={index} data={data} title={`Sensor ${index + 1}`} />
+                  ))
+                ) : (
+                  <p className="text-sm text-slate-600 dark:text-slate-400 text-center">No data to display.</p>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900/70">
             <div className="border-b border-slate-200 p-6 dark:border-slate-800">
               <h2 className="text-lg font-medium text-slate-900 dark:text-slate-100">Decoded fields and sensor bytes</h2>
@@ -233,10 +367,10 @@ const DeviceDataTable = () => {
                           <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-medium text-amber-700 ring-1 ring-inset ring-amber-200 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/30">{row.function_type ?? '-'}</span>
                         </td>
                         <td className="whitespace-nowrap px-4 py-3 text-slate-700 dark:text-slate-300">{row.number_of_bytes ?? '-'}</td>
-                        <td className="whitespace-nowrap px-4 py-3 font-mono text-slate-800 dark:text-slate-200">{row['1byte_1st_sensor'] ?? '-'}</td>
-                        <td className="whitespace-nowrap px-4 py-3 font-mono text-slate-800 dark:text-slate-200">{row['1byte_2nd_sensor'] ?? '-'}</td>
-                        <td className="whitespace-nowrap px-4 py-3 font-mono text-slate-800 dark:text-slate-200">{row['1byte_3rd_sensor'] ?? '-'}</td>
-                        <td className="whitespace-nowrap px-4 py-3 font-mono text-slate-800 dark:text-slate-200">{row['1byte_4th_sensor'] ?? '-'}</td>
+                        <td className="whitespace-nowrap px-4 py-3 font-mono text-slate-800 dark:text-slate-200">{formatSensorStatus(row['1byte_1st_sensor'])}</td>
+                        <td className="whitespace-nowrap px-4 py-3 font-mono text-slate-800 dark:text-slate-200">{formatSensorStatus(row['1byte_2nd_sensor'])}</td>
+                        <td className="whitespace-nowrap px-4 py-3 font-mono text-slate-800 dark:text-slate-200">{formatSensorStatus(row['1byte_3rd_sensor'])}</td>
+                        <td className="whitespace-nowrap px-4 py-3 font-mono text-slate-800 dark:text-slate-200">{formatSensorStatus(row['1byte_4th_sensor'])}</td>
                         <td className="whitespace-nowrap px-4 py-3 font-mono text-slate-800 dark:text-slate-200">{row['2byte_crc'] ?? '-'}</td>
                       </tr>
                     ))
@@ -266,7 +400,7 @@ const DeviceDataTable = () => {
                   disabled={currentPage === 1}
                   className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 active:bg-slate-100 disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
-                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6"/></svg>
+                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" /></svg>
                   Previous
                 </button>
                 <button
@@ -275,7 +409,7 @@ const DeviceDataTable = () => {
                   className="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 active:bg-slate-100 disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
                   Next
-                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6"/></svg>
+                  <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" /></svg>
                 </button>
               </div>
             </div>
@@ -286,4 +420,4 @@ const DeviceDataTable = () => {
   );
 };
 
-export default DeviceDataTable;
+export default DashboardPage;
