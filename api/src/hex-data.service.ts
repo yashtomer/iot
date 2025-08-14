@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { HexData } from './hex-data.entity';
 
 @Injectable()
@@ -46,5 +46,41 @@ export class HexDataService {
       take: limit,
     });
     return { data, total };
+  }
+
+  async getStatusCounts(startDate: Date, endDate: Date): Promise<any> {
+    const results = await this.hexDataRepository.find({
+      where: {
+        createdAt: Between(startDate, endDate),
+      },
+    });
+
+    const sensorCounts = {
+      sensor1: { on: 0, off: 0 },
+      sensor2: { on: 0, off: 0 },
+      sensor3: { on: 0, off: 0 },
+      sensor4: { on: 0, off: 0 },
+    };
+
+    for (const row of results) {
+      if (row['1byte_1st_sensor'] === '01') sensorCounts.sensor1.on++;
+      else sensorCounts.sensor1.off++;
+
+      if (row['1byte_2nd_sensor'] === '01') sensorCounts.sensor2.on++;
+      else sensorCounts.sensor2.off++;
+
+      if (row['1byte_3rd_sensor'] === '01') sensorCounts.sensor3.on++;
+      else sensorCounts.sensor3.off++;
+
+      if (row['1byte_4th_sensor'] === '01') sensorCounts.sensor4.on++;
+      else sensorCounts.sensor4.off++;
+    }
+
+    return [
+      [{ name: 'On', value: sensorCounts.sensor1.on }, { name: 'Off', value: sensorCounts.sensor1.off }],
+      [{ name: 'On', value: sensorCounts.sensor2.on }, { name: 'Off', value: sensorCounts.sensor2.off }],
+      [{ name: 'On', value: sensorCounts.sensor3.on }, { name: 'Off', value: sensorCounts.sensor3.off }],
+      [{ name: 'On', value: sensorCounts.sensor4.on }, { name: 'Off', value: sensorCounts.sensor4.off }],
+    ];
   }
 }

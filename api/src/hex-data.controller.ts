@@ -17,4 +17,14 @@ export class HexDataController {
   ) {
     return this.hexDataService.findAll(page, limit);
   }
+
+  @Get('status-counts')
+  async getStatusCounts(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return this.hexDataService.getStatusCounts(start, end);
+  }
 }
